@@ -396,7 +396,6 @@
 	};
 };
 
-// MIPI display panel PNC357
 &mipi_dcphy0 {
         status = "okay";
 };
@@ -405,8 +404,7 @@
         status = "okay";
 };
 
-// MIPI display panel PNC357
-/*
+/* MIPI display panel PNC357DB1-4
  * mipi_dcphy0 needs to be enabled
  * when dsi0 is enabled
  */
@@ -419,16 +417,17 @@
 		reg = <0>;
 		backlight = <&backlight>;
 
-		// here I commented out the vdd-supply.
+		// here I commented out the vdd-supply since there is no vcc_avee in opi5 dtsi
 		// power-supply = <&vcc_avee>;
-		// reset should be the orange pi 5 reset gpio GPIO1_B1
 		// reset-gpios = <&gpio3 RK_PC6 GPIO_ACTIVE_HIGH>; GPIO3_C6_u
+		// reset pin are modified to orange pi 5 reset gpio GPIO1_B1
 		reset-gpios = <&gpio1 RK_PB1 GPIO_ACTIVE_HIGH>;
 		reset-enable-combined;
 		pinctrl-names = "default";
-		// previously it was pinctrl-0 = <&lcd_rst_gpio>;
+		// pinctrl-0 = <&lcd_rst_gpio>;
+		// pinctrl are modified according to orange pi 5 dtsi
 		pinctrl-0 = <&lcd0_rst_gpio>;
-
+		// below are unchanged from rk3588s-tablet-12c.dtsi
 		reset-delay-ms = <120>;
 		enable-delay-ms = <120>;
 		prepare-delay-ms = <120>;
@@ -559,7 +558,6 @@
 	status = "disabled";
 };
 
-// mipi end
 
 &rkcif {
 	status = "okay";

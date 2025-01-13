@@ -3,16 +3,18 @@
  * Copyright (c) 2021 Rockchip Electronics Co., Ltd.
  *
  */
-
+// copied from rk3588s-orangepi-5.dts, mipi part from rk3588s-tablet-12c.dtsi
+// add support for MIPI display that is connected to mipi_dcphy0
 /dts-v1/;
 
 #include "rk3588s-orangepi-5.dtsi"
 #include "rk3588-linux.dtsi"
-#include "rk3588s-orangepi-5-lcd.dtsi"
+#include "rk3588s-orangepi-5-lcd-pnc357db1.dtsi"
+// #include "rk3588s-orangepi-5-lcd.dtsi"
 
-#include "rk3588s-orangepi-5-camera1.dtsi"
-#include "rk3588s-orangepi-5-camera2.dtsi"
-#include "rk3588s-orangepi-5-camera3.dtsi"
+// #include "rk3588s-orangepi-5-camera1.dtsi"
+// #include "rk3588s-orangepi-5-camera2.dtsi"
+// #include "rk3588s-orangepi-5-camera3.dtsi"
 
 / {
 	model = "Orange Pi 5";
@@ -395,13 +397,6 @@
 	};
 };
 
-&mipi_dcphy0 {
-        status = "okay";
-};
-
-&mipi_dcphy1 {
-        status = "okay";
-};
 
 &rkcif {
 	status = "okay";

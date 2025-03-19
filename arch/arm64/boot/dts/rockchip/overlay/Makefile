@@ -223,7 +223,7 @@ dtbo-$(CONFIG_ARCH_ROCKCHIP) += \
 	rk3588-w1-gpio3-b3.dtbo \
 	rk3588-w1-gpio4-b1.dtbo \
 	rk3588-hdmirx.dtbo \
-	rk3588-no-hdmirx.dts \
+	rk3588-no-hdmirx.dtbo \
 	rk3568-can0-m0.dtbo \
 	rk3568-can1-m0.dtbo \
 	rk3568-can1-m1.dtbo \

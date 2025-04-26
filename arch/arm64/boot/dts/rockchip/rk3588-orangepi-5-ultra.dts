@@ -26,6 +26,8 @@
 	model = "RK3588 OPi 5 Ultra";
 	compatible = "rockchip,rk3588-orangepi-5-ultra", "rockchip,rk3588";
 
+	/delete-node/ chosen;
+
 	/* If hdmirx node is disabled, delete the reserved-memory node here. */
 	reserved-memory {
 		#address-cells = <2>;

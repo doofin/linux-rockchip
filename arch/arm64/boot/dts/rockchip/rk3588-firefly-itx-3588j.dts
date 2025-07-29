@@ -32,8 +32,6 @@
 #define FF_CAM_8MS1M
 #define FF_HDMIRX
 #define FF_DP1
-#define FF_DSI0_V3
-//#define FF_DSI1_V3
 #define FF_CAM_IMX415
 //#define FF_CAM_IMX586
 
@@ -49,14 +47,6 @@
 
 #ifdef FF_CAM_IMX586
 #include "rk3588-firefly-itx-3588j-cam-imx586.dtsi"
-#endif
-
-#if defined(FF_DSI0_V3) && !defined(FF_DSI1_V3)
-#include "rk3588-firefly-itx-3588j-dsi0-mipi101-BSD1218-A101KL68.dtsi"
-#endif
-
-#if defined(FF_DSI1_V3) && !defined(FF_DSI0_V3)
-#include "rk3588-firefly-itx-3588j-dsi1-mipi101-BSD1218-A101KL68.dtsi"
 #endif
 
 / {

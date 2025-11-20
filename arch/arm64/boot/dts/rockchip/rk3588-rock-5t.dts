@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
- * Copyright (c) 2023 Rockchip Electronics Co., Ltd.
- * Copyright (c) 2023 Radxa Limited
+ * Copyright (c) 2024 Rockchip Electronics Co., Ltd.
+ * Copyright (c) 2024 Radxa Computer (Shenzhen) Co., Ltd.
  *
  */
 
@@ -21,8 +21,8 @@
 #include "rk3588-linux.dtsi"
 
 / {
-	model = "Radxa ROCK 5B Plus";
-	compatible = "radxa,rock-5b-plus", "rockchip,rk3588";
+	model = "Radxa ROCK 5T";
+	compatible = "radxa,rock-5t", "rockchip,rk3588";
 
 	/delete-node/ chosen;
 
@@ -56,7 +56,7 @@
 		compatible = "regulator-fixed";
 		regulator-name = "wifi_disable";
 		enable-active-high;
-		gpio = <&gpio4 RK_PA2 GPIO_ACTIVE_HIGH>;
+		gpio = <&gpio1 RK_PB0 GPIO_ACTIVE_HIGH>;
 		regulator-boot-on;
 		regulator-always-on;
 	};
@@ -126,7 +126,7 @@
 		keyup-threshold-microvolt = <1800000>;
 		pinctrl-0 = <&hp_det>;
 		pinctrl-names = "default";
-		hp-det-gpio = <&gpio1 RK_PD5 GPIO_ACTIVE_HIGH>;
+		hp-det-gpio = <&gpio4 RK_PC3 GPIO_ACTIVE_HIGH>;
 		play-pause-key {
 			label = "playpause";
 			linux,code = <164>;
@@ -169,6 +169,18 @@
 		vin-supply = <&vcc_3v3_s3>;
 	};
 
+	vcc3v3_pcie2x1l1: vcc3v3-pcie2x1l1 {
+		compatible = "regulator-fixed";
+		regulator-name = "vcc3v3_pcie2x1l1";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		enable-active-high;
+		regulator-boot-on;
+		regulator-always-on;
+		startup-delay-us = <5000>;
+		vin-supply = <&vcc_3v3_s3>;
+	};
+
 	vcc3v3_pcie2x1l0: vcc3v3-pcie2x1l0 {
 		compatible = "regulator-fixed";
 		regulator-name = "vcc3v3_pcie2x1l0";
@@ -177,7 +189,7 @@
 		enable-active-high;
 		regulator-boot-on;
 		regulator-always-on;
-		gpios = <&gpio1 RK_PD2 GPIO_ACTIVE_HIGH>;
+		gpios = <&gpio2 RK_PC0 GPIO_ACTIVE_HIGH>;
 		startup-delay-us = <50000>;
 		vin-supply = <&vcc5v0_sys>;
 	};
@@ -208,7 +220,7 @@
 		pinctrl-names = "default";
 
 		user-led2 {
-			gpios = <&gpio0 RK_PB7 GPIO_ACTIVE_HIGH>;
+			gpios = <&gpio0 RK_PA0 GPIO_ACTIVE_HIGH>;
 			linux,default-trigger = "default-on";
 			default-state = "on";
 		};
@@ -235,18 +247,16 @@
 	};
 
 	hdmiin-sound {
-		compatible = "simple-audio-card";
-		simple-audio-card,format = "i2s";
-		simple-audio-card,name = "rockchip-hdmiin";
-		simple-audio-card,bitclock-master = <&dailink0_master>;
-		simple-audio-card,frame-master = <&dailink0_master>;
 		status = "okay";
-		simple-audio-card,cpu {
-			sound-dai = <&i2s7_8ch>;
-		};
-		dailink0_master: simple-audio-card,codec {
-			sound-dai = <&hdmiin_dc>;
-		};
+		compatible = "rockchip,hdmi";
+		rockchip,mclk-fs = <128>;
+		rockchip,format = "i2s";
+		rockchip,bitclock-master = <&hdmirx_ctrler>;
+		rockchip,frame-master = <&hdmirx_ctrler>;
+		rockchip,card-name = "rockchip,hdmiin";
+		rockchip,cpu = <&i2s7_8ch>;
+		rockchip,codec = <&hdmirx_ctrler 0>;
+		rockchip,jack-det;
 	};
 };
 
@@ -583,7 +593,7 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&hdmim0_tx1_cec &hdmim0_tx1_hpd &hdmim1_tx1_scl &hdmim1_tx1_sda>;
 	cec-enable = "true";
-	enable-gpios = <&gpio4 RK_PA1 GPIO_ACTIVE_HIGH>;
+	enable-gpios = <&gpio0 RK_PB7 GPIO_ACTIVE_HIGH>;
 };
 
 &hdmi1_in_vp0 {
@@ -608,10 +618,11 @@
 
 	/* Effective level used to trigger HPD: 0-low, 1-high */
 	hpd-trigger-level = <1>;
-	hdmirx-det-gpios = <&gpio1 RK_PC6 GPIO_ACTIVE_LOW>;
+	hdmirx-det-gpios = <&gpio2 RK_PB7 GPIO_ACTIVE_LOW>;
 
 	pinctrl-0 = <&hdmim1_rx_cec &hdmim1_rx_hpdin &hdmim1_rx_scl &hdmim1_rx_sda &hdmirx_det>;
 	pinctrl-names = "default";
+	#sound-dai-cells = <1>;
 };
 
 &hdptxphy_hdmi0 {
@@ -649,22 +660,26 @@
 /* vp0 & vp1 splice for 8K output */
 &vp0 {
 	rockchip,plane-mask = <(1 << ROCKCHIP_VOP2_CLUSTER0 | 1 << ROCKCHIP_VOP2_ESMART0)>;
-	rockchip,primary-plane = <ROCKCHIP_VOP2_ESMART0>;
+	rockchip,primary-plane = <ROCKCHIP_VOP2_CLUSTER0>;
+	cursor-win-id = <ROCKCHIP_VOP2_ESMART0>;
 };
 
 &vp1 {
 	rockchip,plane-mask = <(1 << ROCKCHIP_VOP2_CLUSTER1 | 1 << ROCKCHIP_VOP2_ESMART1)>;
-	rockchip,primary-plane = <ROCKCHIP_VOP2_ESMART1>;
+	rockchip,primary-plane = <ROCKCHIP_VOP2_CLUSTER1>;
+	cursor-win-id = <ROCKCHIP_VOP2_ESMART1>;
 };
 
 &vp2 {
 	rockchip,plane-mask = <(1 << ROCKCHIP_VOP2_CLUSTER2 | 1 << ROCKCHIP_VOP2_ESMART2)>;
-	rockchip,primary-plane = <ROCKCHIP_VOP2_ESMART2>;
+	rockchip,primary-plane = <ROCKCHIP_VOP2_CLUSTER2>;
+	cursor-win-id = <ROCKCHIP_VOP2_ESMART2>;
 };
 
 &vp3 {
 	rockchip,plane-mask = <(1 << ROCKCHIP_VOP2_CLUSTER3 | 1 << ROCKCHIP_VOP2_ESMART3)>;
-	rockchip,primary-plane = <ROCKCHIP_VOP2_ESMART3>;
+	rockchip,primary-plane = <ROCKCHIP_VOP2_CLUSTER3>;
+	cursor-win-id = <ROCKCHIP_VOP2_ESMART3>;
 };
 
 &u2phy2 {
@@ -696,14 +711,6 @@
 };
 
 &usb_host1_ohci {
-	status = "okay";
-};
-
-&usbhost3_0 {
-	status = "okay";
-};
-
-&usbhost_dwc3_0 {
 	status = "okay";
 };
 
@@ -771,9 +778,7 @@
 			try-power-role = "sink";
 			op-sink-microwatt = <1000000>;
 			sink-pdos =
-				<PDO_FIXED(5000, 3000, PDO_FIXED_USB_COMM)
-				 PDO_FIXED(9000, 3000, PDO_FIXED_USB_COMM)
-				 PDO_FIXED(12000, 3000, PDO_FIXED_USB_COMM)>;
+				<PDO_FIXED(5000, 1000, PDO_FIXED_USB_COMM)>;
 
 			source-pdos =
 				<PDO_FIXED(5000, 3000, PDO_FIXED_USB_COMM)>;
@@ -842,8 +847,8 @@
 	status = "okay";
 	orientation-switch;
 	svid = <0xff01>;
-	sbu1-dc-gpios = <&gpio4 RK_PA6 GPIO_ACTIVE_HIGH>;
-	sbu2-dc-gpios = <&gpio4 RK_PA7 GPIO_ACTIVE_HIGH>;
+	sbu1-dc-gpios = <&gpio0 RK_PC4 GPIO_ACTIVE_HIGH>;
+	sbu2-dc-gpios = <&gpio0 RK_PC5 GPIO_ACTIVE_HIGH>;
 
 	port {
 		#address-cells = <1>;
@@ -892,6 +897,12 @@
 &pcie2x1l2 {
 	reset-gpios = <&gpio3 RK_PB0 GPIO_ACTIVE_HIGH>;
 	vpcie3v3-supply = <&vcc3v3_pcie2x1l2>;
+	status = "okay";
+};
+
+&pcie2x1l1 {
+	reset-gpios = <&gpio4 RK_PA2 GPIO_ACTIVE_HIGH>;
+	vpcie3v3-supply = <&vcc3v3_pcie2x1l1>;
 	status = "okay";
 };
 
@@ -1133,13 +1144,13 @@
 
 	headphone {
 		hp_det: hp-det {
-			rockchip,pins = <1 RK_PD5 RK_FUNC_GPIO &pcfg_pull_up>;
+			rockchip,pins = <4 RK_PC3 RK_FUNC_GPIO &pcfg_pull_up>;
 		};
 	};
 
 	hdmirx {
 		hdmirx_det: hdmirx-det {
-			rockchip,pins = <1 RK_PC6 RK_FUNC_GPIO &pcfg_pull_none>;
+			rockchip,pins = <2 RK_PB7 RK_FUNC_GPIO &pcfg_pull_none>;
 		};
 	};
 
@@ -1158,12 +1169,6 @@
 	bt {
 		bt_wake_l: bt-wake-l {
 			rockchip,pins = <3 RK_PD5 RK_FUNC_GPIO &pcfg_pull_none>;
-		};
-	};
-
-	headphone {
-		hp_det: hp-det {
-			rockchip,pins = <1 RK_PD5 RK_FUNC_GPIO &pcfg_pull_up>;
 		};
 	};
 
@@ -1210,7 +1215,7 @@
 		/* GPIO1_A0-A3 */
 		"", "", "PIN_31", "PIN_29",
 		/* GPIO1_A4-A7 */
-		"", "", "", "",
+		"", "", "", "PIN_37",
 
 		/* GPIO1_B0-B3 */
 		"", "PIN_21", "PIN_19", "PIN_23",
